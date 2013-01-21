@@ -7,6 +7,7 @@
 
 #import "RFQuiltLayout.h"
 
+
 @interface RFQuiltLayout ()
 // todo put these back
 @property(nonatomic) CGPoint firstOpenSpace;
@@ -23,7 +24,7 @@
 @property(nonatomic, assign) BOOL hasPositionsCached;
 
 // previous layout cache.  this is to prevent choppiness
-// when we scroll to the bottom of the screen - uicollectionview
+// when we scroll to the bottom of the screen - PSUICollectionView
 // will repeatedly call layoutattributesforelementinrect on
 // each scroll event.  pow!
 @property(nonatomic) NSArray* previousLayoutAttributes;
@@ -53,15 +54,14 @@
 
 - (void) initialize {
     // defaults
-    self.direction = UICollectionViewScrollDirectionVertical;
+    self.direction = PSTCollectionViewScrollDirectionVertical;
     self.blockPixels = CGSizeMake(100.f, 100.f);
 	self.minimumInteritemSpacing=0;
 }
 
 - (CGSize)collectionViewContentSize {
     
-    BOOL isVert = self.direction == UICollectionViewScrollDirectionVertical;
-    
+    BOOL isVert = self.direction == PSTCollectionViewScrollDirectionVertical;
     if (isVert)
         return CGSizeMake(self.collectionView.frame.size.width, (self.furthestBlockPoint.y+1) * self.blockPixels.height);
     else
@@ -78,7 +78,7 @@
     }
     self.previousLayoutRect = rect;
     
-    BOOL isVert = self.direction == UICollectionViewScrollDirectionVertical;
+    BOOL isVert = self.direction == PSTCollectionViewScrollDirectionVertical;
     
     int unrestrictedDimensionStart = isVert? rect.origin.y / self.blockPixels.height : rect.origin.x / self.blockPixels.width;
     int unrestrictedDimensionLength = (isVert? rect.size.height / self.blockPixels.height : rect.size.width / self.blockPixels.width) + 1;
@@ -97,10 +97,10 @@
     return (self.previousLayoutAttributes = [attributes allObjects]);
 }
 
-- (UICollectionViewLayoutAttributes *)layoutAttributesForItemAtIndexPath:(NSIndexPath *)indexPath {
+- (PSUICollectionViewLayoutAttributes *)layoutAttributesForItemAtIndexPath:(NSIndexPath *)indexPath {
     
     CGRect frame = [self frameForIndexPath:indexPath];
-    UICollectionViewLayoutAttributes* attributes = [UICollectionViewLayoutAttributes layoutAttributesForCellWithIndexPath:indexPath];
+    PSUICollectionViewLayoutAttributes* attributes = [PSUICollectionViewLayoutAttributes layoutAttributesForCellWithIndexPath:indexPath];
     attributes.frame = frame;
     return attributes;
 }
@@ -122,14 +122,13 @@
 
 - (void) prepareLayout {
     [super prepareLayout];
-    
     if (!self.delegate) return;
     
-    BOOL isVert = self.direction == UICollectionViewScrollDirectionVertical;
+    BOOL isVert = self.direction == PSTCollectionViewScrollDirectionVertical;
     
     int unrestrictedRow = 0;
     if (isVert)
-        unrestrictedRow = (self.collectionView.frame.size.height / [self blockPixels].height)+1;
+        unrestrictedRow =(self.collectionView.frame.size.height / [self blockPixels].height)+1;
     else
         unrestrictedRow = (self.collectionView.frame.size.width / [self blockPixels].width)+1;
 	
@@ -139,13 +138,13 @@
     [self fillInBlocksToUnrestrictedRow:unrestrictedRow];
 }
 
-- (UICollectionViewLayoutAttributes *)finalLayoutAttributesForDisappearingItemAtIndexPath:(NSIndexPath *)itemIndexPath {
-    UICollectionViewLayoutAttributes* attributes = [self layoutAttributesForItemAtIndexPath:itemIndexPath];
+- (PSTCollectionViewLayoutAttributes *)finalLayoutAttributesForDisappearingItemAtIndexPath:(NSIndexPath *)itemIndexPath {
+    PSTCollectionViewLayoutAttributes* attributes = [self layoutAttributesForItemAtIndexPath:itemIndexPath];
     attributes.alpha = 0;
     return attributes;
 }
 
-- (void) setDirection:(UICollectionViewScrollDirection)direction {
+- (void) setDirection:(PSTCollectionViewScrollDirection)direction {
     _direction = direction;
     [self invalidateLayout];
 }
@@ -160,7 +159,7 @@
 
 - (void) fillInBlocksToUnrestrictedRow:(int)endRow {
     
-    BOOL vert = self.direction == UICollectionViewScrollDirectionVertical;
+    BOOL vert = self.direction == PSTCollectionViewScrollDirectionVertical;
     
     // we'll have our data structure as if we're planning
     // a vertical layout, then when we assign positions to
@@ -187,7 +186,7 @@
 
 - (BOOL) placeBlockAtIndex:(NSIndexPath*)indexPath {
     CGSize blockSize = [self.delegate blockSizeForItemAtIndexPath:indexPath];
-    BOOL vert = self.direction == UICollectionViewScrollDirectionVertical;
+    BOOL vert = self.direction == PSTCollectionViewScrollDirectionVertical;
     
     
     return ![self traverseOpenTiles:^(CGPoint blockOrigin) {
@@ -231,7 +230,7 @@
 // returning no in the callback will
 // terminate the iterations early
 - (BOOL) traverseTilesBetweenUnrestrictedDimension:(int)begin and:(int)end iterator:(BOOL(^)(CGPoint))block {
-    BOOL isVert = self.direction == UICollectionViewScrollDirectionVertical;
+    BOOL isVert = self.direction == PSTCollectionViewScrollDirectionVertical;
     
     // the double ;; is deliberate, the unrestricted dimension should iterate indefinitely
     for(int unrestrictedDimension = begin; unrestrictedDimension<end; unrestrictedDimension++) {
@@ -262,7 +261,7 @@
 // terminate the iterations early
 - (BOOL) traverseOpenTiles:(BOOL(^)(CGPoint))block {
     BOOL allTakenBefore = YES;
-    BOOL isVert = self.direction == UICollectionViewScrollDirectionVertical;
+    BOOL isVert = self.direction == PSTCollectionViewScrollDirectionVertical;
     
     // the double ;; is deliberate, the unrestricted dimension should iterate indefinitely
     for(int unrestrictedDimension = (isVert? self.firstOpenSpace.y : self.firstOpenSpace.x);; unrestrictedDimension++) {
@@ -294,7 +293,7 @@
 
 
 - (NSIndexPath*)indexPathForPosition:(CGPoint)point {
-    BOOL isVert = self.direction == UICollectionViewScrollDirectionVertical;
+    BOOL isVert = self.direction == PSTCollectionViewScrollDirectionVertical;
     
     // to avoid creating unbounded nsmutabledictionaries we should
     // have the innerdict be the unrestricted dimension
@@ -306,7 +305,7 @@
 }
 
 - (void) setPosition:(CGPoint)point forIndexPath:(NSIndexPath*)indexPath {
-    BOOL isVert = self.direction == UICollectionViewScrollDirectionVertical;
+    BOOL isVert = self.direction == PSTCollectionViewScrollDirectionVertical;
     
     // to avoid creating unbounded nsmutabledictionaries we should
     // have the innerdict be the unrestricted dimension
@@ -335,7 +334,7 @@
 
 
 - (CGRect) frameForIndexPath:(NSIndexPath*)path {
-    BOOL isVert = self.direction == UICollectionViewScrollDirectionVertical;
+    BOOL isVert = self.direction == PSTCollectionViewScrollDirectionVertical;
     CGPoint position = [self positionForIndexPath:path];
     CGSize elementSize = [self.delegate blockSizeForItemAtIndexPath:path];
     
@@ -359,7 +358,7 @@
 // or vertically
 
 - (int) restrictedDimensionBlockSize {
-    BOOL isVert = self.direction == UICollectionViewScrollDirectionVertical;
+    BOOL isVert = self.direction == PSTCollectionViewScrollDirectionVertical;
     
     int size = isVert? self.collectionView.frame.size.width / self.blockPixels.width : self.collectionView.frame.size.height / self.blockPixels.height;
     
