@@ -374,8 +374,4 @@
     return size;
 }
 
-- (void) setFurthestBlockPoint:(CGPoint)point {
-    _furthestBlockPoint = CGPointMake(MAX(self.furthestBlockPoint.x, point.x), MAX(self.furthestBlockPoint.y, point.y));
-}
-
 @end
