@@ -112,7 +112,7 @@
 - (void) invalidateLayout {
     [super invalidateLayout];
     
-    self.furthestBlockPoint = CGPointZero;
+    _furthestBlockPoint = CGPointZero;
     self.firstOpenSpace = CGPointZero;
     self.previousLayoutRect = CGRectZero;
     self.previousLayoutAttributes = nil;
@@ -372,6 +372,10 @@
     }
     
     return size;
+}
+
+- (void) setFurthestBlockPoint:(CGPoint)point {
+    _furthestBlockPoint = CGPointMake(MAX(self.furthestBlockPoint.x, point.x), MAX(self.furthestBlockPoint.y, point.y));
 }
 
 @end
