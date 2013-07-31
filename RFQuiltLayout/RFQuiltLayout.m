@@ -112,7 +112,7 @@
 - (void) invalidateLayout {
     [super invalidateLayout];
     
-    self.furthestBlockPoint = CGPointZero;
+    _furthestBlockPoint = CGPointZero;
     self.firstOpenSpace = CGPointZero;
     self.previousLayoutRect = CGRectZero;
     self.previousLayoutAttributes = nil;
